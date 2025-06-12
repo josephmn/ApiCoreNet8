@@ -1,0 +1,6 @@
+@ApiCoreNet8_HostAddress = http://localhost:5001
+
+GET {{ApiCoreNet8_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
