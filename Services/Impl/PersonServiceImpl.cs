@@ -70,11 +70,51 @@ namespace ApiCoreNet8.Services.Impl
         }
         public Person Update(int id, Person person)
         {
-            throw new NotImplementedException();
+            var existingPerson = _context.Person.FirstOrDefault(p => p.Id == id);
+
+            if (existingPerson == null)
+            {
+                throw new KeyNotFoundException($"No se encontró ninguna persona con ID = {id}.");
+            }
+
+            existingPerson.Document = person.Document;
+            existingPerson.Name = person.Name;
+            existingPerson.LastName = person.LastName;
+            existingPerson.Age = person.Age;
+            existingPerson.DateBirthday = person.DateBirthday;
+            existingPerson.Email = person.Email;
+            existingPerson.Status = person.Status;
+
+            try
+            {
+                _context.SaveChanges(); // Guarda los cambios en la base de datos
+            }
+            catch (DbUpdateException dbEx)
+            {
+                throw new Exception("Error al actualizar en la base de datos: " + dbEx.Message, dbEx);
+            }
+
+            return existingPerson;
         }
         public void Delete(int id)
         {
-            throw new NotImplementedException();
+            var person = _context.Person.FirstOrDefault(p => p.Id == id);
+            
+            if (person == null)
+            {
+                throw new KeyNotFoundException($"No se encontró ninguna persona con ID = {id}.");
+            }
+
+            _context.Person.Remove(person);
+
+            try
+            {
+                _context.SaveChanges(); // Guarda los cambios en la base de datos
+            }
+            catch (DbUpdateException dbEx)
+            {
+                throw new Exception("Error al eliminar en la base de datos: " + dbEx.Message, dbEx);
+            }
         }
     }
 }
