@@ -1,5 +1,7 @@
 ﻿using ApiCoreNet8.Models;
 using ApiNetCore.Data;
+using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace ApiCoreNet8.Services.Impl
 {
@@ -24,21 +26,47 @@ namespace ApiCoreNet8.Services.Impl
         }
         public Person GetById(int id)
         {
-            throw new NotImplementedException();
-            //var persona = _persons.FirstOrDefault(p => p.Id == id);
-            //if (persona == null)
-            //{
-            //    throw new NotImplementedException("No personas available.");
-            //}
-            //return persona; // Return the persona with the specified ID
+            try
+            {
+                var person = _context.Person.FirstOrDefault(p => p.Id == id);
+
+                if (person == null)
+                {
+                    throw new KeyNotFoundException($"Person with ID {id} not found.");
+                }
+
+                return person;
+            }
+            catch (Exception)
+            {
+                throw new NotImplementedException();
+            }
         }
         public Person Create(Person person)
         {
-            throw new NotImplementedException();
-            //person.Id = _persons.Max(p => p.Id) + 1; // Assign a new ID based on the max existing ID
-            //_persons.Add(person); // Add the new persona to the list
+            try
+            {
+                _context.Person.Add(person);
 
-            //return person; // Return the saved persona
+                int result = _context.SaveChanges();
+
+                if (result == 0)
+                {
+                    throw new Exception("No se pudo guardar la persona en la base de datos.");
+                }
+
+                return person;
+            }
+            catch (DbUpdateException dbEx)
+            {
+                // Error a nivel de base de datos (restricciones, claves foráneas, etc.)
+                throw new Exception("Error al guardar en la base de datos: " + dbEx.Message, dbEx);
+            }
+            catch (Exception ex)
+            {
+                // Otro tipo de errores
+                throw new Exception("Error inesperado al crear la persona: " + ex.Message, ex);
+            }
         }
         public Person Update(int id, Person person)
         {
