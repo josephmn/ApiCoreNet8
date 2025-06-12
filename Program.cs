@@ -1,7 +1,13 @@
+using ApiNetCore.Data;
 using ApiCoreNet8.Services;
 using ApiCoreNet8.Services.Impl;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+var connectionString = builder.Configuration.GetConnectionString("MySQLConnection");
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
 builder.Services.AddControllers();
 // Add services to the container.
@@ -10,7 +16,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Inyectar la implementación correcta
-builder.Services.AddSingleton<IPersonService, PersonServiceImpl>();
+//builder.Services.AddSingleton<IPersonService, PersonServiceImpl>();
+builder.Services.AddScoped<IPersonService, PersonServiceImpl>();
 
 var app = builder.Build();
 
